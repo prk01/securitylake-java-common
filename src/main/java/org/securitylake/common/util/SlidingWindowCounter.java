@@ -1,6 +1,4 @@
-
 package org.securitylake.common.util;
-
 
 import com.google.common.annotations.VisibleForTesting;
 

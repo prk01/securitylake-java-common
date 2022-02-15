@@ -2,16 +2,12 @@ plugins {
     id 'java'
 }
 
-group 'org.securitylake.common'
-version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-
-    annotationProcessor 'org.projectlombok:lombok:1.18.4'
 
     implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
 
@@ -31,4 +27,50 @@ dependencies {
 
 test {
     useTestNG()
+}
+
+// Signing
+apply plugin: 'signing'
+signing {
+    sign configurations.archives
+}
+
+// Deploying
+apply plugin: 'maven-publish'
+
+// Add Javadoc JAR and sources JAR to artifact
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+// Configure group ID, artifact ID, and version
+group = "org.securitylake"
+version = externalVersion
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact('securitylake-java-common-1.0-SNAPSHOT.jar') {
+                extension 'jar'
+            }
+        }
+    }
+    repositories {
+        maven {
+            name 'deploy'
+            url deployRepoUrl
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
 }
